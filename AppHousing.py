@@ -3,9 +3,18 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from joblib import load
+import urllib.request
+import os
 
-# Cargar el mejor modelo entrenado
-model = load("best_model.joblib")
+# Enlace de descarga directa del archivo en Google Drive
+url = 'https://drive.google.com/uc?id=1cCCxfo4_1WOyYLg7geDuj476ZBeduSz2&export=download'
+
+# Descargar el archivo en la carpeta temporal de la aplicación
+model_path = 'best_model.joblib'
+urllib.request.urlretrieve(url, model_path)
+
+# Cargar el modelo descargado
+model = load(model_path)
 
 # Cargar los datos del conjunto de datos de viviendas
 @st.cache
