@@ -19,7 +19,7 @@ model = load(model_path)
 # Cargar los datos del conjunto de datos de viviendas
 @st.cache
 def load_data():
-    csv_path = "datasets/housing/housing.csv"
+    csv_path = "data/housing.csv"
     return pd.read_csv(csv_path)
 
 housing = load_data()
