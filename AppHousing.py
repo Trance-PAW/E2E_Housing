@@ -1,12 +1,28 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import joblib
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.linear_model import LinearRegression
+import numpy as np
+from sklearn.base import BaseEstimator, TransformerMixin
 
+
+
+
+# Definir la clase CombinedAttributesAdder
+rooms_ix, bedrooms_ix, population_ix, households_ix = 3, 4, 5, 6
+class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
+    def __init__(self, add_bedrooms_per_room=True):
+        self.add_bedrooms_per_room = add_bedrooms_per_room
+    def fit(self, X, y=None):
+        return self
+    def transform(self, X):
+        rooms_per_household = X[:, rooms_ix] / X[:, households_ix]
+        population_per_household = X[:, population_ix] / X[:, households_ix]
+        if self.add_bedrooms_per_room:
+            bedrooms_per_room = X[:, bedrooms_ix] / X[:, rooms_ix]
+            return np.c_[X, rooms_per_household, population_per_household,
+                         bedrooms_per_room]
+        else:
+            return np.c_[X, rooms_per_household, population_per_household]
 # Cargar los modelos
 pipeline = joblib.load('pipeline.sav')
 model = joblib.load('modelLR.sav')
@@ -15,8 +31,8 @@ model = joblib.load('modelLR.sav')
 st.title("Predicción del Valor de Casas en California")
 
 # Entrada de datos del usuario
-longitude = st.number_input("Longitud", value=-118.0)
-latitude = st.number_input("Latitud", value=34.0)
+longitude = st.number_input("Longitud", value=-118.0, min_value=-124.35, max_value=-114.31)
+latitude = st.number_input("Latitud", value=34.0, min_value=32.54, max_value=41.95)
 housing_median_age = st.number_input("Edad Mediana de la Vivienda", value=25)
 total_rooms = st.number_input("Total de Habitaciones", value=3000)
 total_bedrooms = st.number_input("Total de Dormitorios", value=500)
