@@ -1,37 +1,27 @@
-import numpy as np
-import pandas as pd
-import streamlit as st 
-import sklearn
-from sklearn import preprocessing
-from sklearn.linear_model import LinearRegression
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.impute import SimpleImputer
-import joblib
-import os
-# Definir la clase si es parte del pipeline
-rooms_ix, bedrooms_ix, population_ix, households_ix = 3, 4, 5, 6
-class CombinedAttributesAdder(BaseEstimator, TransformerMixin):
-    def __init__(self, add_bedrooms_per_room=True):
-        self.add_bedrooms_per_room = add_bedrooms_per_room
-    def fit(self, X, y=None):
-        return self
-    def transform(self, X):
-        rooms_per_household = X[:, rooms_ix] / X[:, households_ix]
-        population_per_household = X[:, population_ix] / X[:, households_ix]
-        if self.add_bedrooms_per_room:
-            bedrooms_per_room = X[:, bedrooms_ix] / X[:, rooms_ix]
-            return np.c_[X, rooms_per_household, population_per_household,
-                         bedrooms_per_room]
-        else:
-            return np.c_[X, rooms_per_household, population_per_household]
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Sep  6 17:11:07 2024
 
-# Cargar modelo y pipeline
+@author: jesus
+"""
+
+import streamlit as st
+import pandas as pd
+import numpy as np
+import joblib
+import urllib.request
+
+# Descargar los archivos del modelo desde GitHub
 @st.cache
 def cargar_modelo():
+    url_model = "https://raw.githubusercontent.com/Trance-PAW/E2E_Housing/main/modelLR.sav"
+    url_pipeline = "https://raw.githubusercontent.com/Trance-PAW/E2E_Housing/main/pipeline.sav"
+    
+    # Descargar archivos
+    urllib.request.urlretrieve(url_model, 'modelLR.sav')
+    urllib.request.urlretrieve(url_pipeline, 'pipeline.sav')
+    
+    # Cargar modelo y pipeline
     model = joblib.load('modelLR.sav')
     pipeline = joblib.load('pipeline.sav')
     return model, pipeline
