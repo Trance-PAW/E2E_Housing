@@ -60,7 +60,7 @@ pipeline = joblib.load('pipeline.sav')
 
 
 def load_data():
-    csv_path = "data/housing/housing.csv"
+    csv_path = "data/housing.csv"
     return pd.read_csv(csv_path)
 
 housing = load_data()
