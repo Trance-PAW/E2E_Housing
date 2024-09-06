@@ -1,7 +1,15 @@
-import streamlit as st
-import pandas as pd
-import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import streamlit as st 
+import sklearn
+from sklearn import preprocessing
+from sklearn.linear_model import LinearRegression
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.impute import SimpleImputer
 import joblib
 import os
 
