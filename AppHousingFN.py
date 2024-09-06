@@ -58,9 +58,9 @@ def cargar_modelo():
 modelLR = joblib.load('modelLR.sav')
 pipeline = joblib.load('pipeline.sav')
 
-@st.cache
+
 def load_data():
-    csv_path = "datasets/housing/housing.csv"
+    csv_path = "data/housing/housing.csv"
     return pd.read_csv(csv_path)
 
 housing = load_data()
