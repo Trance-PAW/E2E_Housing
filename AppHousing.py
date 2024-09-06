@@ -25,6 +25,7 @@ if not os.path.exists(model_path):
 
 # Cargar el modelo
 model = joblib.load(model_path)
+pipeline = joblib.load('pipeline.sav')
 
 # Cargar los datos del conjunto de datos de viviendas
 @st.cache
