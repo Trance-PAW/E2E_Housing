@@ -2,30 +2,21 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from joblib import load
-import urllib.request
+import joblib
 import os
 
-# Enlace de descarga directa del archivo en Google Drive
-url = 'https://drive.google.com/uc?id=1cCCxfo4_1WOyYLg7geDuj476ZBeduSz2&export=download'
+# Cargar el modelo y el pipeline
+try:
+    full_pipeline = joblib.load('pipeline.sav')
+    st.write("Pipeline cargado correctamente")
+except Exception as e:
+    st.error(f"Error al cargar el pipeline: {e}")
 
-# Descargar el archivo en la carpeta local
-model_path = 'modelRL.sav'
-if not os.path.exists(model_path):
-    urllib.request.urlretrieve(url, model_path)
-
-# Descargar el archivo en la carpeta temporal de la aplicación
-model_path = 'best_model.joblib'
-urllib.request.urlretrieve(url, model_path)
-
-# Descargar el archivo en la carpeta local
-model_path = 'model RL.sav'
-if not os.path.exists(model_path):
-    urllib.request.urlretrieve(url, model_path)
-
-# Cargar el modelo
-model = joblib.load(model_path)
-full_pipeline = joblib.load('pipeline.sav')
+try:
+    model = joblib.load('modelRL.sav')
+    st.write("Modelo cargado correctamente")
+except Exception as e:
+    st.error(f"Error al cargar el modelo: {e}")
 
 # Cargar los datos del conjunto de datos de viviendas
 @st.cache
@@ -42,21 +33,6 @@ st.title("Predicción del Valor de Casas en California")
 if st.checkbox("Mostrar datos crudos"):
     st.subheader("Datos crudos")
     st.write(housing.head())
-
-# Visualización de histogramas
-st.subheader("Visualización de los datos")
-if st.checkbox("Mostrar histogramas"):
-    st.write("Histograma de las variables numéricas")
-    fig, ax = plt.subplots(figsize=(20, 15))
-    housing.hist(bins=50, figsize=(20, 15), ax=ax)
-    st.pyplot(fig)
-
-# Mostrar la correlación de las variables
-if st.checkbox("Mostrar matriz de correlación"):
-    st.write("Matriz de correlación de las variables numéricas")
-    housing_numeric = housing.select_dtypes(include=[np.number])  # Seleccionamos solo las columnas numéricas
-    corr_matrix = housing_numeric.corr()
-    st.write(corr_matrix["median_house_value"].sort_values(ascending=False))
 
 # Sección de predicciones
 st.subheader("Hacer una predicción")
@@ -84,9 +60,16 @@ if st.button("Predecir"):
         "ocean_proximity": [ocean_proximity]
     })
 
-    # Aplicar las transformaciones necesarias (si las tienes en el pipeline del modelo)
-    input_data_prepared = full_pipeline.transform(input_data)
+    # Verificar si el pipeline y el modelo se cargaron correctamente antes de hacer la predicción
+    if 'full_pipeline' in locals() and 'model' in locals():
+        try:
+            # Aplicar las transformaciones necesarias
+            input_data_prepared = full_pipeline.transform(input_data)
 
-    # Hacer la predicción
-    prediction = model.predict(input_data_prepared)
-    st.success(f"El valor estimado de la casa es: ${prediction[0]:,.2f}")
+            # Hacer la predicción
+            prediction = model.predict(input_data_prepared)
+            st.success(f"El valor estimado de la casa es: ${prediction[0]:,.2f}")
+        except Exception as e:
+            st.error(f"Error en la predicción: {e}")
+    else:
+        st.error("El pipeline o el modelo no están disponibles para hacer predicciones.")
