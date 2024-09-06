@@ -60,11 +60,15 @@ if st.button("Predecir"):
         "ocean_proximity": [ocean_proximity]
     })
 
+    # Mostrar columnas de input_data
+    st.write("Columnas de input_data:", input_data.columns)
+
     # Verificar si el pipeline y el modelo se cargaron correctamente antes de hacer la predicción
     if 'full_pipeline' in locals() and 'model' in locals():
         try:
             # Aplicar las transformaciones necesarias
             input_data_prepared = full_pipeline.transform(input_data)
+            st.write("Datos transformados correctamente")
 
             # Hacer la predicción
             prediction = model.predict(input_data_prepared)
